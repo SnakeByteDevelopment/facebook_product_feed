@@ -62,7 +62,7 @@ class FacebookProductFeedController(http.Controller):
                 # image_link = '%s/web/image/product.template/%s/image_1920' % (
                 #     feed_config.website_id.domain, product_id
                 # )
-                image_link = '/web/image/product.template/%s/image_1920' % (product_id)
+                image_link = '/web/image/product.template/%s/image_1920/' % (product_id)
 
             availability = 'in stock' if product.qty_available > 0 else 'out of stock'
             price = f"{product.list_price} {product.currency_id.name}"
