@@ -8,8 +8,8 @@ class FacebookProductFeedController(http.Controller):
     @http.route(['/facebook_feed/<int:website_id>'], type='http', auth='public', website=True)
     def facebook_product_feed(self, website_id, **kwargs):
         """
-        Voorbeeld-CSV-feed: de route is /facebook_feed/<website_id>
-        Eventueel kun je nog een token check toevoegen.
+        CSV-feed voor Facebook met onder meer 'image_link' en 'condition'.
+        Route: /facebook_feed/<website_id>?token=<jouw_token>
         """
         # 1. Ophalen van de feedconfig
         feed_config = request.env['facebook.product.feed.config'].sudo().search([
@@ -25,12 +25,9 @@ class FacebookProductFeedController(http.Controller):
         if feed_config.feed_token and feed_config.feed_token != token:
             return "Ongeldige token of geen toegang tot deze feed.", 403
 
-        # 3. Producten ophalen die gekoppeld zijn aan de website
-        #    Dit kan verschillen per setup. Standaard (website_sale) 
-        #    is er een Many2many-relatie in de product.template: website_ids
-        #    of je filtert op published='True' voor alleen gepubliceerde producten.
+        # 3. Producten ophalen
         products = request.env['product.template'].sudo().search([
-            ('website_id', '=', website_id),  # Of ('website_ids', 'in', website_id)
+            ('website_id', '=', website_id),  # pas aan indien nodig (vb: ('website_ids', 'in', website_id))
             ('sale_ok', '=', True)
         ])
 
@@ -38,24 +35,40 @@ class FacebookProductFeedController(http.Controller):
         output = io.StringIO()
         writer = csv.writer(output, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        # Facebook vraagt gewoonlijk om kolommen zoals: 
-        # id,title,description,link,image_link,availability,price,brand,condition ...
-        header = ['id', 'title', 'description', 'link', 'image_link', 'availability', 'price']
+        # Uitgebreide header (Facebook-velden)
+        header = [
+            'id', 
+            'title', 
+            'description', 
+            'link', 
+            'image_link', 
+            'availability', 
+            'price',
+            'condition'  # Nieuw veld
+        ]
         writer.writerow(header)
 
         for product in products:
-            # Een paar voorbeeldwaarden
             product_id = product.id
-            title = product.name
+            title = product.name or ''
             description = product.description_sale or ''
             link = '%s/shop/product/%s' % (feed_config.website_id.domain, product_id)
+
+            # Nieuw: we genereren zelf de afbeelding-URL
+            # (zorg dat je site publiek toegankelijk is)
             image_link = ''
             if product.image_1920:
-                image_link = '/web/image/product.template/{}/image_1920/{}'.format(product.id, product.name)
+                # Eventueel kun je ook de domeinnaam erbij zetten, bijvoorbeeld:
+                # image_link = '%s/web/image/product.template/%s/image_1920' % (
+                #     feed_config.website_id.domain, product_id
+                # )
+                image_link = '/web/image/product.template/%s/image_1920' % (product_id)
 
             availability = 'in stock' if product.qty_available > 0 else 'out of stock'
-            # Prijs in default valuta (uitgesimplificeerd)
             price = f"{product.list_price} {product.currency_id.name}"
+
+            # Nieuw: condition-veld toevoegen (hard-coded 'new', of pas dit aan)
+            condition = 'new'
 
             writer.writerow([
                 product_id,
@@ -64,14 +77,14 @@ class FacebookProductFeedController(http.Controller):
                 link,
                 image_link,
                 availability,
-                price
+                price,
+                condition
             ])
 
-        # 5. Response teruggeven als CSV-bestand
         csv_data = output.getvalue()
         output.close()
 
-        # Stel de juiste headers in
+        # 5. Response teruggeven als CSV-bestand
         return Response(
             csv_data,
             headers=[
