@@ -91,7 +91,7 @@ class FacebookProductFeedController(http.Controller):
             # Eventueel extra kolommen voor variant attributen
             # Je zou product.attribute_value_ids kunnen uitlezen:
             # vb.: color, size = None, None
-            for value in product.attribute_value_ids:
+            for value in product.product_template_attribute_value_ids:
                 if value.attribute_id.name.lower() == 'kleur':
                     color = value.name
             #     if value.attribute_id.name.lower() == 'size':
