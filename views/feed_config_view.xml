@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_facebook_product_feed_config_form" model="ir.ui.view">
+        <field name="name">facebook.product.feed.config.form</field>
+        <field name="model">facebook.product.feed.config</field>
+        <field name="arch" type="xml">
+            <form string="Facebook Product Feed Config">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                        <field name="website_id"/>
+                        <field name="feed_token" placeholder="Unieke token voor beveiliging"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_facebook_product_feed_config_tree" model="ir.ui.view">
+        <field name="name">facebook.product.feed.config.tree</field>
+        <field name="model">facebook.product.feed.config</field>
+        <field name="arch" type="xml">
+            <tree string="Facebook Product Feed Config">
+                <field name="name"/>
+                <field name="website_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_facebook_product_feed_config" model="ir.actions.act_window">
+        <field name="name">Facebook Product Feed Config</field>
+        <field name="res_model">facebook.product.feed.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>Beheer hier je Facebook Product Feeds per website.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_facebook_product_feed_config" 
+              name="Facebook Product Feed"
+              parent="website.menu_website_configuration"
+              action="action_facebook_product_feed_config"
+              sequence="99"/>
+</odoo>
