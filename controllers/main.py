@@ -106,7 +106,6 @@ class FacebookProductFeedController(http.Controller):
                 color,
                 # plus je extra attributen...
             ])
-        ])
         
         header = [
             'id', 
