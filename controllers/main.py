@@ -49,6 +49,11 @@ class FacebookProductFeedController(http.Controller):
             'color'
             # plus evt. extra kolommen voor variant attributen
         ]
+
+        # 4. CSV genereren
+        output = io.StringIO()
+        writer = csv.writer(output, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
         
         writer.writerow(header)
         
