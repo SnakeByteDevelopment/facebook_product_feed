@@ -29,9 +29,6 @@ class FacebookProductFeedController(http.Controller):
 
         # Uitgaand van Odoo 15 (voorbeeldcode in controllers/main.py)
 
-        products = request.env['product.product'].sudo().search([
-            ('product_tmpl_id.website_id', '=', website_id),  # of ('product_tmpl_id.website_ids', 'in', website_id)
-            ('sale_ok', '=', True)
         # Uitgaand van Odoo 15 (voorbeeldcode in controllers/main.py)
         
         products = request.env['product.product'].sudo().search([
