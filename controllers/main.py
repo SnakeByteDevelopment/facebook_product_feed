@@ -49,8 +49,8 @@ class FacebookProductFeedController(http.Controller):
             title = product.name
             description = product.description_sale or ''
             link = '%s/shop/product/%s' % (feed_config.website_id.domain, product_id)
-	    image_link = ''
-	    if product.image_1920:
+            image_link = ''
+            if product.image_1920:
                 image_link = '/web/image/product.template/{}/image_1920/{}'.format(product.id, product.name)
 
             availability = 'in stock' if product.qty_available > 0 else 'out of stock'
